@@ -23,8 +23,6 @@ SADA transforms complex financial data into an interactive experience by creatin
 
 ## Visual Overview
 
-<img src="main.png" width="100%"/>
-
 ---
 
 ## Features
