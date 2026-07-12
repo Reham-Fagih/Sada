@@ -21,10 +21,6 @@ SADA transforms complex financial data into an interactive experience by creatin
 
 ---
 
-## Visual Overview
-
----
-
 ## Features
 
 - AI-powered financial digital twin
