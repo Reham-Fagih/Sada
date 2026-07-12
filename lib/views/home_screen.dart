@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
+import '../widgets/app_top_bar.dart';
+import '../widgets/app_bottom_nav.dart';
 
-
-class HomeScreen extends StatefulWidget {
+/// Home Screen — "الرئيسية"
+///
+/// UI ONLY. No business logic here — this screen is purely presentational.
+/// Data (income, linked accounts count, etc.) is currently hardcoded as
+/// placeholders and should later be supplied by [HomeController].
+/// Feature-card callbacks are left empty / TODO — wire them to the
+/// controller when logic is implemented.
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  // Purely visual state for the bottom nav highlight — no business logic.
-  int _selectedNavIndex = 2; // "الرئيسية" active by default
 
   @override
   Widget build(BuildContext context) {
@@ -47,14 +47,16 @@ class _HomeScreenState extends State<HomeScreen> {
           SafeArea(
             child: Column(
               children: [
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(20, 8, 20, 0),
+                  child: AppTopBar(showBackButton: false),
+                ),
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const SizedBox(height: 8),
-                        _HomeHeader(),
                         const SizedBox(height: 18),
                         const _CityStatusChip(),
                         const SizedBox(height: 24),
@@ -82,57 +84,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                _BottomNavBar(
-                  selectedIndex: _selectedNavIndex,
-                  onItemSelected: (index) {
-                    setState(() => _selectedNavIndex = index);
-                    // TODO: navigate to the corresponding screen via controller
-                  },
-                ),
+                const AppBottomNavBar(currentTab: AppNavTab.home),
               ],
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-// =======================================================================
-// Header: avatar + "صدى" title
-// =======================================================================
-class _HomeHeader extends StatelessWidget {
-  const _HomeHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        // Avatar
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: AppColors.white.withOpacity(0.5), width: 1.5),
-            image: const DecorationImage(
-              image: AssetImage('assets/images/avatar.png'),
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-        // Title
-        Text(
-          'صدى',
-          style: TextStyle(
-            fontFamily: 'BeVietnamPro',
-            fontWeight: FontWeight.w700,
-            fontSize: 24,
-            color: AppColors.white,
-          ),
-        ),
-      ],
     );
   }
 }
@@ -389,115 +346,6 @@ class _FeatureCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-// =======================================================================
-// Bottom navigation bar
-// =======================================================================
-class _BottomNavItemData {
-  final IconData icon;
-  final String label;
-
-  const _BottomNavItemData({required this.icon, required this.label});
-}
-
-class _BottomNavBar extends StatelessWidget {
-  final int selectedIndex;
-  final ValueChanged<int> onItemSelected;
-
-  const _BottomNavBar({
-    required this.selectedIndex,
-    required this.onItemSelected,
-  });
-
-  // Listed in reading (right-to-left) order so the visual layout under
-  // RTL directionality matches the Figma design left-to-right:
-  // ربط البنوك | الرئيسية | محاكاة القرار | حسابي
-  static const List<_BottomNavItemData> _items = [
-    _BottomNavItemData(icon: Icons.account_balance_outlined, label: 'ربط البنوك'),
-    _BottomNavItemData(icon: Icons.apartment_rounded, label: 'الرئيسية'),
-    _BottomNavItemData(icon: Icons.bar_chart_rounded, label: 'محاكاة القرار'),
-    _BottomNavItemData(icon: Icons.person_outline_rounded, label: 'حسابي'),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-        decoration: BoxDecoration(
-          color: AppColors.navy950.withOpacity(0.92),
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: AppColors.white.withOpacity(0.08)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: List.generate(_items.length, (index) {
-            final item = _items[index];
-            final isActive = index == selectedIndex;
-            return _BottomNavItem(
-              icon: item.icon,
-              label: item.label,
-              isActive: isActive,
-              onTap: () => onItemSelected(index),
-            );
-          }),
-        ),
-      ),
-    );
-  }
-}
-
-class _BottomNavItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  const _BottomNavItem({
-    required this.icon,
-    required this.label,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.symmetric(
-          horizontal: isActive ? 16 : 10,
-          vertical: 8,
-        ),
-        decoration: BoxDecoration(
-          color: isActive ? AppColors.copper500 : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: isActive
-            ? Icon(icon, size: 22, color: AppColors.white)
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(icon, size: 20, color: AppColors.white.withOpacity(0.7)),
-                  const SizedBox(height: 4),
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontFamily: 'BeVietnamPro',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 10,
-                      color: AppColors.white.withOpacity(0.7),
-                    ),
-                  ),
-                ],
-              ),
       ),
     );
   }
